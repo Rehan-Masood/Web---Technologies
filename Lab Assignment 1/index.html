@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CVForge | Premium CV Generator</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg premium-nav sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <div class="brand-icon"><i class="fa-solid fa-file-lines"></i></div>
+        <span class="brand-text">CV<span class="brand-accent">Forge</span></span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <i class="fa-solid fa-bars" style="color:var(--gold)"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-center gap-2">
+          <li class="nav-item">
+            <button class="btn btn-outline-gold btn-sm" onclick="downloadPDF()">
+              <i class="fa-solid fa-file-pdf me-1"></i> PDF
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-gold btn-sm" onclick="downloadPNG()">
+              <i class="fa-solid fa-image me-1"></i> PNG
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-gold btn-sm" onclick="downloadJPEG()">
+              <i class="fa-solid fa-image me-1"></i> JPEG
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-gold btn-sm" onclick="printCV()">
+              <i class="fa-solid fa-print me-1"></i> Print
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-icon-circle" onclick="toggleTheme()" title="Toggle Theme">
+              <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-banner">
+    <div class="container text-center py-5">
+      <h1 class="hero-title">Premium <span class="gold-gradient-text">CV Generator</span></h1>
+      <p class="hero-subtitle">Professional templates · Live preview · Map integration · Export options</p>
+    </div>
+  </header>
+
+  <section class="template-section py-4">
+    <div class="container">
+      <div class="section-label mb-3"><i class="fa-solid fa-palette me-2"></i>Select CV Template</div>
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <div class="template-card active" data-template="executive" onclick="switchTemplate('executive', this)">
+          <div class="template-preview executive-preview">
+            <div class="tp-bar"></div><div class="tp-line"></div><div class="tp-line short"></div>
+          </div>
+          <div class="template-name">Template 1</div>
+        </div>
+
+        <div class="template-card" data-template="modern" onclick="switchTemplate('modern', this)">
+          <div class="template-preview modern-preview">
+            <div class="tp-bar"></div><div class="tp-line"></div><div class="tp-line short"></div>
+          </div>
+          <div class="template-name">Template 2</div>
+        </div>
+
+        <div class="template-card" data-template="creative" onclick="switchTemplate('creative', this)">
+          <div class="template-preview creative-preview">
+            <div class="tp-bar"></div><div class="tp-line"></div><div class="tp-line short"></div>
+          </div>
+          <div class="template-name">Template 3</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="dashboard-container container-fluid px-3 px-md-4 pb-5">
+    <div class="row g-4">
+
+      <!-- LEFT SIDE -->
+      <div class="col-12 col-xl-4">
+        <div class="glass-panel form-panel h-100">
+          <div class="panel-header">
+            <i class="fa-solid fa-pen me-2"></i> Enter Your Information
+            <div class="ms-auto d-flex gap-2">
+              <button class="btn btn-xs btn-outline-gold" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i></button>
+              <button class="btn btn-xs btn-outline-gold" onclick="clearAll()"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Personal Information</div>
+            <div class="mb-3 text-center">
+              <div class="photo-upload-wrap mx-auto">
+                <img id="previewPhoto" class="preview-photo" src="https://ui-avatars.com/api/?name=Your+Name&background=D4AF37&color=121212&size=120&bold=true" alt="Profile">
+                <label for="photoInput" class="photo-upload-btn"><i class="fa-solid fa-camera"></i></label>
+                <input type="file" id="photoInput" accept="image/*" hidden onchange="uploadPhoto(event)">
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <input type="text" class="form-control premium-input" id="fullName" placeholder="Full Name" oninput="updatePreview()">
+              </div>
+              <div class="col-12">
+                <input type="text" class="form-control premium-input" id="profTitle" placeholder="Professional Title" oninput="updatePreview()">
+              </div>
+              <div class="col-md-6">
+                <input type="email" class="form-control premium-input" id="email" placeholder="Email" oninput="updatePreview()">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control premium-input" id="phone" placeholder="Phone" oninput="updatePreview()">
+              </div>
+              <div class="col-md-6">
+                <input type="date" class="form-control premium-input" id="dob">
+              </div>
+              <div class="col-md-6">
+                <select class="form-select premium-input" id="gender">
+                  <option value="">Select Gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <input type="text" class="form-control premium-input" id="address" placeholder="City, Country" oninput="updatePreview()">
+              </div>
+              <div class="col-12">
+                <button class="btn btn-gold w-100" onclick="detectLocation()">
+                  <i class="fa-solid fa-location-crosshairs me-2"></i>Detect My Location
+                </button>
+                <button class="btn btn-outline-gold w-100 mt-2" id="retryLocationButton" onclick="detectLocation()" style="display: none;">
+                  <i class="fa-solid fa-arrows-rotate me-2"></i>Detect My Location Again
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Education</div>
+            <div class="row g-3">
+              <div class="col-12">
+                <input type="text" class="form-control premium-input" id="degree" placeholder="Degree" oninput="updatePreview()">
+              </div>
+              <div class="col-12">
+                <input type="text" class="form-control premium-input" id="university" placeholder="University" oninput="updatePreview()">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control premium-input" id="eduYear" placeholder="Year of Passing" oninput="updatePreview()">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control premium-input" id="cgpa" placeholder="CGPA" oninput="updatePreview()">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title d-flex align-items-center">
+              Work Experience
+              <button class="btn btn-xs btn-gold ms-auto" onclick="addExperience()"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div id="experienceContainer"></div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title d-flex align-items-center">
+              Skills
+              <button class="btn btn-xs btn-gold ms-auto" onclick="addSkill()"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div id="skillsContainer" class="d-flex flex-wrap gap-2 mb-3"></div>
+            <div class="d-flex gap-2 flex-column flex-sm-row">
+              <input type="text" class="form-control premium-input" id="skillInput" placeholder="Enter skill" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
+              <button class="btn btn-gold" onclick="addSkill()">Add</button>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title d-flex align-items-center">
+              Projects
+              <button class="btn btn-xs btn-gold ms-auto" onclick="addProject()"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div id="projectsContainer"></div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Generate CV</div>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-gold flex-fill" onclick="downloadPDF()">
+                <i class="fa-solid fa-file-pdf me-1"></i>PDF
+              </button>
+              <button class="btn btn-gold flex-fill" onclick="downloadPNG()">
+                <i class="fa-solid fa-image me-1"></i>PNG
+              </button>
+              <button class="btn btn-gold flex-fill" onclick="downloadJPEG()">
+                <i class="fa-solid fa-image me-1"></i>JPEG
+              </button>
+              <button class="btn btn-emerald flex-fill" onclick="printCV()">
+                <i class="fa-solid fa-print me-1"></i>Print
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER PREVIEW -->
+      <div class="col-12 col-xl-5">
+        <div class="glass-panel preview-panel">
+          <div class="panel-header">
+            <i class="fa-solid fa-eye me-2"></i> CV Preview
+          </div>
+
+          <div id="cvPreview" class="cv-preview template-executive">
+            <div class="cv-header">
+              <div class="cv-photo-wrap">
+                <img id="cvPhoto" class="cv-photo" src="https://ui-avatars.com/api/?name=Your+Name&background=D4AF37&color=121212&size=120&bold=true" alt="Profile Photo">
+              </div>
+              <div class="cv-header-info">
+                <h1 class="cv-name" id="cvName">Usman Khan</h1>
+                <h2 class="cv-title" id="cvTitlePreview">Software Engineer</h2>
+                <div class="cv-contacts">
+                  <span id="cvEmail"><i class="fa-solid fa-envelope"></i> usman@example.com</span>
+                  <span id="cvPhone"><i class="fa-solid fa-phone"></i> +92-300-1234567</span>
+                  <span id="cvAddress"><i class="fa-solid fa-location-dot"></i> Lahore, Pakistan</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="cv-section" id="cvSummarySection">
+              <div class="cv-section-title">Summary</div>
+              <p class="cv-summary-text" id="cvSummaryText">Experienced software engineer with expertise in developing modern web applications.</p>
+            </div>
+
+            <div class="cv-section" id="cvExperienceSection">
+              <div class="cv-section-title">Experience</div>
+              <div id="cvExperienceList"></div>
+            </div>
+
+            <div class="cv-section" id="cvEducationSection">
+              <div class="cv-section-title">Education</div>
+              <div class="cv-item-header">
+                <span class="cv-item-title" id="cvDegree">B.Sc. in Computer Science — University</span>
+                <span class="cv-item-date" id="cvEduYear">2014–2018</span>
+              </div>
+              <div class="cv-item-sub" id="cvCgpa">CGPA: 3.7</div>
+            </div>
+
+            <div class="cv-section" id="cvSkillsSection">
+              <div class="cv-section-title">Skills</div>
+              <div id="cvSkillBars" class="cv-skill-bars"></div>
+            </div>
+
+            <div class="cv-section" id="cvProjectsSection">
+              <div class="cv-section-title">Projects</div>
+              <div id="cvProjectsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE MAP -->
+      <div class="col-12 col-xl-3">
+        <div class="glass-panel map-panel">
+          <div class="panel-header">
+            <i class="fa-solid fa-map-location-dot me-2"></i> Your Location
+            <button class="btn btn-xs btn-outline-gold ms-auto" onclick="detectLocation()">Detect</button>
+          </div>
+
+          <div class="map-container">
+            <div class="map-placeholder" id="mapPlaceholder">
+              <i class="fa-solid fa-map-pin fa-2x mb-2"></i>
+              <p>Enter address or use current location</p>
+              <button class="btn btn-gold btn-sm" onclick="detectLocation()">Use My Location</button>
+            </div>
+            <div id="leafletMap" style="width:100%; height:350px; display:none;"></div>
+          </div>
+
+          <div class="map-address-display" id="mapAddressDisplay"></div>
+          <div class="px-3 pb-3">
+            <button class="btn btn-outline-gold w-100" onclick="openAddressOnOpenStreetMap()">
+              <i class="fa-solid fa-earth-americas me-1"></i> Open in OpenStreetMap
+            </button>
+          </div>
+
+          <!-- Premium Location Info Section -->
+          <div class="location-info-section">
+            <div class="info-divider"></div>
+            <div class="info-grid">
+              <div class="info-item">
+                <i class="fa-solid fa-shield-keyhole"></i>
+                <span>Private Address</span>
+              </div>
+              <div class="info-item">
+                <i class="fa-solid fa-lock"></i>
+                <span>No Exact Coords</span>
+              </div>
+              <div class="info-item">
+                <i class="fa-solid fa-globe"></i>
+                <span>Public CV Safe</span>
+              </div>
+            </div>
+            <p class="info-text">Your location is stored securely and never exposed to CV viewers</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+    <div id="appToast" class="toast premium-toast align-items-center border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2">
+          <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+          <span id="toastMsg">Action completed</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="premium-footer text-center py-3">
+    <span>CVForge &copy; 2026 — Premium CV Generator</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* Premium Map Panel & Buttons Styling */
+
+/* Premium Map Panel Background & Effects */
+.map-panel {
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0.95) 0%, rgba(26, 26, 26, 0.85) 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.2) !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.4s ease;
+}
+
+.map-panel:hover {
+  border-color: rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 0 12px 48px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.map-panel .panel-header {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.06) 0%, rgba(15, 123, 108, 0.04) 100%);
+  border-bottom: 2px solid rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Detect Button in Header */
+.map-panel .btn-xs.btn-outline-gold {
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  background: rgba(212, 175, 55, 0.08);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+}
+
+.map-panel .btn-xs.btn-outline-gold:hover {
+  background: rgba(212, 175, 55, 0.18);
+  border-color: var(--gold);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Use My Location Button */
+.map-panel .btn-sm.btn-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a027 100%);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  min-width: 180px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.map-panel .btn-sm.btn-gold:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+}
+
+/* Open in Google Maps Button */
+.map-panel .btn-outline-gold.w-100 {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1.5px solid var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--gold-light);
+  padding: 12px 16px;
+}
+
+.map-panel .btn-outline-gold.w-100:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.08) 100%);
+  border-color: var(--gold-light);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+  transform: translateY(-2px);
+  color: var(--gold);
+}
+
+.map-panel .btn-outline-gold.w-100 i {
+  transition: transform 0.3s ease;
+}
+
+.map-panel .btn-outline-gold.w-100:hover i {
+  transform: translateX(2px);
+}
