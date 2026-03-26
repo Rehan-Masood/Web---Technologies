@@ -1,6 +1,6 @@
 ## Rehan's Web Technologies Projects
 
-A collection of my HTML, CSS & JavaScript mini projects built during my learning journey.
+A collection of my HTML, CSS & JavaScript projects built during my learning journey.
 
 ## 🚀 Project Showcase
 
