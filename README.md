@@ -10,7 +10,7 @@ Project Showcase
 |-----|-------------------------------|------------------------------------|
 | 01  | Assign # 1                    | [Live Demo](web-technologies-aa9t-3g082kcaz-rehan-web.vercel.app) |
 | 02  | Assign # 2                    | [Live Demo](web-technologies-pqsa-rcu6k5tm3-rehan-web.vercel.app) |
-| 03  | Lab Assign # 1                  | [Live Demo](web-technologies-167g.vercel.app) |
+| 03  | Lab Assign # 1                  | [Live Demo](web-technologies-167g-azgbcnp23-rehan-web.vercel.app) |
 
 
 Made with ❤️ by Muhammad Rehan Masood
