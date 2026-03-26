@@ -9,7 +9,7 @@ Project Showcase
 | #   | Project Name                  | Live Demo                          |
 |-----|-------------------------------|------------------------------------|
 | 01  | Assign # 1                    | [Live Demo](web-technologies-aa9t-3g082kcaz-rehan-web.vercel.app) |
-| 02  | Assign # 2                    | [Live Demo](web-technologies-pqsa-p5n40pz89-rehan-web.vercel.app) |
+| 02  | Assign # 2                    | [Live Demo](web-technologies-pqsa-git-main-rehan-web.vercel.app) |
 | 03  | Lab Assign # 1                  | [Live Demo](web-technologies-167g-azgbcnp23-rehan-web.vercel.app) |
 
 
