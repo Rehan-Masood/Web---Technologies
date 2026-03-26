@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizNova Elite</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+            grotesk: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body x-data="quizNovaApp()" x-init="initialize()" :class="{ 'light-mode': !isDark }">
+  <div class="app-shell">
+    <aside class="sidebar" :class="{ open: sidebarOpen }" aria-label="Sidebar">
+      <div class="sidebar-inner">
+        <div class="brand">
+          <div class="brand-icon">⚡</div>
+          <div>
+            <h1>QuizNova</h1>
+            <p>Premium Edition</p>
+          </div>
+        </div>
+
+        <div class="profile-card glass">
+          <div class="avatar" x-text="userProfile.level"></div>
+          <div>
+            <h2>Welcome Back</h2>
+            <p>Level <span x-text="userProfile.level"></span> Elite</p>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="section-label">Categories</p>
+          <div class="stack">
+            <button class="chip" :class="{ active: selectedCategory === 'All' }" @click="selectedCategory = 'All'">🎯 All</button>
+            <button class="chip" :class="{ active: selectedCategory === 'Tech' }" @click="selectedCategory = 'Tech'">💻 Technology</button>
+            <button class="chip" :class="{ active: selectedCategory === 'Science' }" @click="selectedCategory = 'Science'">🧪 Science</button>
+            <button class="chip" :class="{ active: selectedCategory === 'Business' }" @click="selectedCategory = 'Business'">📊 Business</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="section-label">Difficulty</p>
+          <div class="difficulty-row">
+            <button class="orb easy" :class="{ active: difficulty === 'Easy' }" @click="difficulty = 'Easy'">✓</button>
+            <button class="orb medium" :class="{ active: difficulty === 'Medium' }" @click="difficulty = 'Medium'">★</button>
+            <button class="orb hard" :class="{ active: difficulty === 'Hard' }" @click="difficulty = 'Hard'">⚡</button>
+          </div>
+        </div>
+
+        <div class="glass streak-box">
+          <div class="flame">🔥</div>
+          <p>Current Streak</p>
+          <h3 x-text="userProfile.streak"></h3>
+          <span x-text="streakText"></span>
+        </div>
+
+        <div class="stats-mini">
+          <div class="glass mini-card">
+            <p>Total Quizzes</p>
+            <h4 x-text="userProfile.totalQuizzes"></h4>
+          </div>
+          <div class="glass mini-card">
+            <p>Best Score</p>
+            <h4 x-text="userProfile.bestScore + '%'"></h4>
+          </div>
+          <div class="glass mini-card">
+            <p>Average Score</p>
+            <h4 x-text="userProfile.averageScore + '%'"></h4>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="section-label">Settings</p>
+          <div class="stack">
+            <button class="chip" @click="toggleTheme()">
+              <span x-text="isDark ? '☀️ Light Mode' : '🌙 Dark Mode'"></span>
+            </button>
+            <button class="chip" :class="{ active: soundEnabled }" @click="toggleSound()">
+              <span x-text="soundEnabled ? '🔊 Sound On' : '🔇 Sound Off'"></span>
+            </button>
+            <button class="chip" @click="resetProgress()">🗑 Reset Progress</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section" x-show="userProfile.quizHistory.length > 0">
+          <p class="section-label">Recent Quizzes</p>
+          <div class="stack">
+            <template x-for="(quiz, idx) in userProfile.quizHistory.slice(-3).reverse()" :key="idx">
+              <div class="glass recent-quiz">
+                <strong x-text="quiz.category"></strong>
+                <p x-text="quiz.score + '% • ' + quiz.difficulty"></p>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"></div>
+
+    <main class="main-content">
+      <header class="topbar glass">
+        <button class="menu-btn mobile-only" @click="sidebarOpen = !sidebarOpen" aria-label="Toggle menu">☰</button>
+        <div class="topbar-title">QuizNova Elite</div>
+        <div class="topbar-actions">
+          <button class="icon-btn" @click="toggleTheme()" title="Toggle theme">🌓</button>
+          <button class="icon-btn" @click="showLeaderboard = true" title="Leaderboard">🏆</button>
+        </div>
+      </header>
+
+      <section x-show="appState === 'dashboard'" x-transition.opacity.duration.300ms class="page-section">
+        <div class="hero glass">
+          <div class="hero-copy">
+            <div class="eyebrow">Premium AI-powered learning</div>
+            <h1>Master Anything 10× Faster</h1>
+            <p>
+              Quiz smarter with timers, streaks, daily challenges, achievements,
+              review mode, detailed PDF reports, and a premium responsive experience.
+            </p>
+
+            <div class="hero-actions">
+              <button class="btn btn-primary" @click="startQuiz()">🚀 Launch Elite Quiz</button>
+              <button class="btn btn-secondary" @click="startDailyChallenge()">📅 Daily Challenge</button>
+            </div>
+          </div>
+
+          <div class="hero-panel">
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+            <div class="hero-stat-grid">
+              <div class="glass stat-card">
+                <p>Quizzes</p>
+                <h3 x-text="userProfile.totalQuizzes"></h3>
+              </div>
+              <div class="glass stat-card">
+                <p>Level</p>
+                <h3 x-text="userProfile.level"></h3>
+              </div>
+              <div class="glass stat-card">
+                <p>Best</p>
+                <h3 x-text="userProfile.bestScore + '%'"></h3>
+              </div>
+              <div class="glass stat-card">
+                <p>XP</p>
+                <h3 x-text="userProfile.totalXP"></h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="dashboard-grid">
+          <div class="glass feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Lightning Fast</h3>
+            <p>Quick challenge flow with real timers and instant scoring.</p>
+          </div>
+          <div class="glass feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Instant Feedback</h3>
+            <p>See answers, explanations, and performance instantly.</p>
+          </div>
+          <div class="glass feature-card">
+            <div class="feature-icon">📄</div>
+            <h3>PDF Reports</h3>
+            <p>Download detailed quiz reports with right/wrong answer review.</p>
+          </div>
+        </section>
+
+        <section class="performance-grid">
+          <div class="glass panel">
+            <p class="panel-label">Completed</p>
+            <h3 x-text="userProfile.totalQuizzes"></h3>
+          </div>
+          <div class="glass panel">
+            <p class="panel-label">Average Score</p>
+            <h3 x-text="userProfile.averageScore + '%'"></h3>
+          </div>
+          <div class="glass panel">
+            <p class="panel-label">Current Streak</p>
+            <h3 x-text="userProfile.streak"></h3>
+          </div>
+          <div class="glass panel">
+            <p class="panel-label">Level</p>
+            <h3 x-text="'L' + userProfile.level"></h3>
+          </div>
+        </section>
+
+        <section class="two-col-grid">
+          <div class="glass dashboard-card">
+            <div class="card-head">
+              <h3>📅 Daily Challenge</h3>
+              <span class="pill">Fresh</span>
+            </div>
+            <p class="muted">
+              New challenge generated from today’s date and your current level.
+            </p>
+            <div class="spacer-sm"></div>
+            <button class="btn btn-secondary w-full" @click="startDailyChallenge()">Start Daily Challenge</button>
+          </div>
+
+          <div class="glass dashboard-card">
+            <div class="card-head">
+              <h3>🏅 Achievements</h3>
+              <span class="pill" x-text="userProfile.achievements.length"></span>
+            </div>
+            <div class="achievement-grid compact">
+              <template x-for="item in unlockedAchievements" :key="item.id">
+                <div class="achievement-chip">
+                  <span x-text="item.icon"></span>
+                  <div>
+                    <strong x-text="item.name"></strong>
+                    <p x-text="item.description"></p>
+                  </div>
+                </div>
+              </template>
+              <p x-show="unlockedAchievements.length === 0" class="muted">No achievements unlocked yet.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section x-show="appState === 'quizActive'" x-transition.opacity.duration.300ms class="page-section">
+        <div class="glass quiz-shell">
+          <div class="quiz-top">
+            <div>
+              <p class="muted">
+                <span x-text="currentQuiz.category"></span> •
+                <span x-text="currentQuiz.difficulty"></span>
+                <template x-if="currentQuiz.isDaily">
+                  <span> • Daily Challenge</span>
+                </template>
+              </p>
+              <h2>Question <span x-text="currentQuestionIndex + 1"></span> / <span x-text="currentQuiz.questions.length"></span></h2>
+            </div>
+            <div class="timer-box">
+              <div class="timer-value" x-text="timeRemaining + 's'"></div>
+              <span>remaining</span>
+            </div>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill" :style="`width:${progressPercentage}%`"></div>
+          </div>
+
+          <div class="question-block">
+            <h3 x-html="currentQuestion?.question"></h3>
+          </div>
+
+          <div class="options-list">
+            <template x-for="(option, index) in currentQuestion?.options || []" :key="index">
+              <button
+                class="quiz-option"
+                :class="{
+                  selected: selectedAnswerIndex === index && !showFeedback,
+                  correct: showFeedback && index === currentQuestion.correct,
+                  incorrect: showFeedback && selectedAnswerIndex === index && index !== currentQuestion.correct
+                }"
+                @click="selectAnswer(index)"
+                :disabled="selectedAnswerIndex !== null"
+              >
+                <span class="option-badge" x-text="String.fromCharCode(65 + index)"></span>
+                <span class="option-text" x-text="option"></span>
+              </button>
+            </template>
+          </div>
+
+          <div x-show="showFeedback" class="feedback-box" :class="feedbackIsCorrect ? 'success' : 'error'">
+            <strong x-text="feedbackIsCorrect ? 'Correct!' : 'Incorrect'"></strong>
+            <p x-text="currentQuestion?.explanation"></p>
+          </div>
+
+          <div class="quiz-actions">
+            <button class="btn btn-secondary" x-show="!showFeedback" @click="skipQuestion()">Skip</button>
+            <button class="btn btn-primary" x-show="showFeedback" @click="nextQuestion()"
+              x-text="currentQuestionIndex < currentQuiz.questions.length - 1 ? 'Next Question' : 'See Results'">
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section x-show="appState === 'quizResult'" x-transition.opacity.duration.300ms class="page-section">
+        <div class="glass result-shell">
+          <div class="score-ring">
+            <div class="score-ring-inner">
+              <span x-text="finalScore + '%'"></span>
+            </div>
+          </div>
+
+          <h2>Quiz Complete</h2>
+          <p class="muted" x-text="performanceMessage"></p>
+
+          <div class="result-grid">
+            <div class="glass panel">
+              <p class="panel-label">Correct</p>
+              <h3 x-text="currentQuiz.score + '/' + currentQuiz.questions.length"></h3>
+            </div>
+            <div class="glass panel">
+              <p class="panel-label">Accuracy</p>
+              <h3 x-text="finalScore + '%'"></h3>
+            </div>
+            <div class="glass panel">
+              <p class="panel-label">Category</p>
+              <h3 x-text="currentQuiz.category"></h3>
+            </div>
+            <div class="glass panel">
+              <p class="panel-label">Difficulty</p>
+              <h3 x-text="currentQuiz.difficulty"></h3>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button class="btn btn-secondary" @click="appState = 'quizReview'">📝 Review Answers</button>
+            <button class="btn btn-secondary" @click="generatePDFReport()">📥 Download PDF</button>
+            <button class="btn btn-secondary" @click="restartQuiz()">Back to Dashboard</button>
+            <button class="btn btn-primary" @click="startQuiz()">Try Another Quiz</button>
+          </div>
+        </div>
+      </section>
+
+      <section x-show="appState === 'quizReview'" x-transition.opacity.duration.300ms class="page-section">
+        <div class="glass review-shell">
+          <div class="review-head">
+            <h2>Answer Review</h2>
+            <div class="review-actions">
+              <button class="btn btn-secondary" @click="appState = 'quizResult'">Back to Results</button>
+              <button class="btn btn-primary" @click="generatePDFReport()">Download PDF</button>
+            </div>
+          </div>
+
+          <div class="review-list">
+            <template x-for="(answer, idx) in currentQuiz.answers" :key="idx">
+              <div class="glass review-card">
+                <div class="review-card-top">
+                  <h3 x-text="'Question ' + (idx + 1)"></h3>
+                  <span class="pill" :class="answer.correct ? 'pill-success' : 'pill-danger'" x-text="answer.correct ? 'Correct' : 'Wrong'"></span>
+                </div>
+
+                <p class="review-question" x-text="answer.question"></p>
+
+                <div class="review-answers">
+                  <div>
+                    <strong>Your answer:</strong>
+                    <span x-text="answer.selectedIndex >= 0 ? answer.options[answer.selectedIndex] : 'Not answered'"></span>
+                  </div>
+                  <div>
+                    <strong>Correct answer:</strong>
+                    <span x-text="answer.options[answer.correctIndex]"></span>
+                  </div>
+                </div>
+
+                <p class="muted" x-text="answer.explanation"></p>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="fab-wrap">
+      <button class="fab" @click="fabMenuOpen = !fabMenuOpen">+</button>
+      <div class="fab-menu" x-show="fabMenuOpen" x-transition>
+        <button @click="startQuiz(); fabMenuOpen = false">🚀 Start Quiz</button>
+        <button @click="startDailyChallenge(); fabMenuOpen = false">📅 Daily</button>
+        <button @click="showLeaderboard = true; fabMenuOpen = false">🏆 Leaderboard</button>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" x-show="showLeaderboard" x-transition.opacity @click="showLeaderboard = false"></div>
+    <div class="modal-card glass" x-show="showLeaderboard" x-transition>
+      <div class="modal-head">
+        <h3>🏆 Global Leaderboard</h3>
+        <button @click="showLeaderboard = false">✕</button>
+      </div>
+      <div class="leaderboard-list">
+        <template x-for="(entry, idx) in topScores" :key="idx">
+          <div class="leaderboard-row">
+            <div class="rank" x-text="idx + 1"></div>
+            <div>
+              <strong x-text="entry.name"></strong>
+              <p>Level <span x-text="entry.level"></span></p>
+            </div>
+            <div><span x-text="entry.score + '%'"></span></div>
+            <div><span x-text="entry.quizzes + ' quizzes'"></span></div>
+            <div>🔥 <span x-text="entry.streak"></span></div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div class="toast-wrap" x-show="showToast" x-transition>
+      <div class="toast" :class="toastType">
+        <span x-text="toastMessage"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
