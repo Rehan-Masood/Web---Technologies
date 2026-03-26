@@ -1,10 +1,10 @@
-Rehan's Web Technologies Projects
+## Rehan's Web Technologies Projects
 
-A collection of my HTML, CSS & JavaScript projects built during my learning journey.
+A collection of my HTML, CSS & JavaScript mini projects built during my learning journey.
 
-Project Showcase
+## 🚀 Project Showcase
 
-🚀 Explore each project individually andview live demos to see them in action:
+Explore each project individually and view live demos to see them in action:
 
 | #   | Project Name                  | Live Demo                          |
 |-----|-------------------------------|------------------------------------|
@@ -13,4 +13,4 @@ Project Showcase
 | 03  | [Lab Assign # 1](./Lab%20Assignment%201)                 | [Live Demo](https://web-technologies-167g-azgbcnp23-rehan-web.vercel.app) |
 
 
-Made with ❤️ by Muhammad Rehan Masood
+## Made with ❤️ by Muhammad Rehan Masood
