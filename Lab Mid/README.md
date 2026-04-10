@@ -64,6 +64,9 @@ Food Express/
 │   └── img/                  # Images folder
 
 ```
+## Screenshots
+1.
+(./Lab%20Mid/Screenshots_
 
 ## 🔐 Demo Accounts
 
