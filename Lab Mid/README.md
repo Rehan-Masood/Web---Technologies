@@ -66,7 +66,7 @@ Food Express/
 ```
 ## Screenshots
 1.
-(./Lab%20Mid/Screenshots_
+(./Lab%20Mid/Screenshots)
 
 ## 🔐 Demo Accounts
 
