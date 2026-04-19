@@ -105,6 +105,21 @@ Food Express/
 ![18.](./Screenshots/18.png)
 19.
 ![19.](./Screenshots/19.png)
+20.
+![20.](./Screenshots/20.png)
+21.
+![21.](./Screenshots/21.png)
+22.
+![22.](./Screenshots/22.png)
+23.
+![23.](./Screenshots/23.png)
+24.
+![24.](./Screenshots/24.png)
+25.
+![26.](./Screenshots/26.png)
+27.
+![27.](./Screenshots/27.png)
+
 ## 🔐 Demo Accounts
 
 ### Admin Account
