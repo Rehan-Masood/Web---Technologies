@@ -1,341 +1,463 @@
-<!-- Food Express Helpers and Global Functions -->
-<script>
-// ========== Global Helper Functions ==========
+// Food Express Helpers and Global Functions
 
-// Add to cart helper
 function addItemToCart(itemId) {
   if (!auth.isLoggedIn()) {
-    ui.showToast('Please login to add items to cart', 'warning');
-    window.location.href = '?page=login';
+    ui.showToast("Please login to add items to cart", "warning");
+    window.location.href = "?page=login";
     return;
   }
 
   const item = storage.getMenuItemById(itemId);
   if (!item) {
-    ui.showToast('Item not found', 'danger');
+    ui.showToast("Item not found", "danger");
     return;
   }
 
-  const result = cart.addItem(item, 1);
+  const result = cart.addItem(itemId, 1);
   if (result.success) {
-    ui.showToast(result.message, 'success');
+    ui.showToast(result.message, "success");
+    if (typeof ui.updateCartBadge === "function") {
+      ui.updateCartBadge();
+    }
   } else {
-    ui.showToast(result.error, 'warning');
+    ui.showToast(result.error || "Could not add item to cart", "warning");
   }
 }
 
-// Update cart quantity helper
 function updateCartQuantity(cartItemId, quantity) {
-  if (quantity < 1) {
+  const nextQty = Number(quantity);
+
+  if (nextQty < 1) {
     removeFromCart(cartItemId);
     return;
   }
-  cart.updateQuantity(cartItemId, quantity);
-  router.loadcartPage();
+
+  const result = cart.updateQuantity(cartItemId, nextQty);
+  if (!result || result.success === false) {
+    ui.showToast((result && result.error) || "Failed to update cart", "danger");
+    return;
+  }
+
+  if (typeof ui.updateCartBadge === "function") {
+    ui.updateCartBadge();
+  }
+
+  if (typeof router !== "undefined" && typeof router.loadCartPage === "function") {
+    router.loadCartPage();
+  }
 }
 
-// Remove from cart helper
 function removeFromCart(cartItemId) {
-  cart.removeItem(cartItemId);
-  ui.showToast('Item removed from cart', 'info');
-  router.loadcartPage();
+  const result = cart.removeItem(cartItemId);
+
+  if (!result || result.success === false) {
+    ui.showToast((result && result.error) || "Failed to remove item", "danger");
+    return;
+  }
+
+  ui.showToast("Item removed from cart", "info");
+
+  if (typeof ui.updateCartBadge === "function") {
+    ui.updateCartBadge();
+  }
+
+  if (typeof router !== "undefined" && typeof router.loadCartPage === "function") {
+    router.loadCartPage();
+  }
 }
 
-// Update order status (admin)
 function updateOrderStatus(orderId, status) {
   if (!auth.isAdmin()) {
-    ui.showToast('Admin access required', 'danger');
+    ui.showToast("Admin access required", "danger");
     return;
   }
 
-  const order = orders.getOrderById(orderId);
-  if (order && order.status !== status) {
-    const updated = storage.updateOrderStatus(orderId, status);
-    if (updated) {
-      ui.showToast('Order status updated', 'success');
-      router.loadAdminSection('orders');
-    }
+  const result = orders.updateOrderStatus(orderId, status);
+  if (!result || result.success === false) {
+    ui.showToast((result && result.error) || "Failed to update order status", "danger");
+    return;
+  }
+
+  ui.showToast("Order status updated", "success");
+
+  if (typeof router !== "undefined" && typeof router.loadAdminSection === "function") {
+    router.loadAdminSection("orders");
   }
 }
 
-// Delete menu item (admin)
 function deleteMenuItem(itemId) {
   if (!auth.isAdmin()) {
-    ui.showToast('Admin access required', 'danger');
+    ui.showToast("Admin access required", "danger");
     return;
   }
 
-  if (confirm('Are you sure you want to delete this menu item?')) {
-    storage.deleteMenuItem(itemId);
-    ui.showToast('Menu item deleted', 'success');
-    setTimeout(() => router.loadAdminSection('menu'), 500);
+  if (!confirm("Are you sure you want to delete this menu item?")) {
+    return;
+  }
+
+  storage.deleteMenuItem(itemId);
+  ui.showToast("Menu item deleted", "success");
+
+  if (typeof router !== "undefined" && typeof router.loadAdminSection === "function") {
+    setTimeout(() => router.loadAdminSection("menu"), 300);
   }
 }
 
-// Edit menu item (admin)
 function editMenuItem(itemId) {
   if (!auth.isAdmin()) {
-    ui.showToast('Admin access required', 'danger');
+    ui.showToast("Admin access required", "danger");
     return;
   }
 
   const item = storage.getMenuItemById(itemId);
   if (!item) {
-    ui.showToast('Item not found', 'danger');
+    ui.showToast("Item not found", "danger");
     return;
   }
 
-  const form = document.getElementById('admin-menu-item-form');
-  if (form) {
-    form.dataset.editId = itemId;
-    form.querySelector('[name="name"]').value = item.name;
-    form.querySelector('[name="category"]').value = item.category;
-    form.querySelector('[name="price"]').value = item.price;
-    form.querySelector('[name="available"]').value = item.available ? 'true' : 'false';
-    form.querySelector('[name="description"]').value = item.description;
-    form.querySelector('[name="image"]').value = item.image;
-
-    document.getElementById('item-form-title').textContent = 'Edit Menu Item';
-    document.getElementById('menu-item-form-container').style.display = 'block';
+  const form = document.getElementById("admin-menu-item-form");
+  if (!form) {
+    ui.showToast("Menu item form not found", "danger");
+    return;
   }
-}
 
-// Show menu item form
-function showMenuItemForm() {
-  const container = document.getElementById('menu-item-form-container');
-  if (container) {
-    container.style.display = 'block';
-    document.getElementById('item-form-title').textContent = 'Add Menu Item';
-    const form = document.getElementById('admin-menu-item-form');
-    if (form) {
-      form.reset();
-      delete form.dataset.editId;
+  form.dataset.editId = itemId;
+  form.querySelector('[name="name"]').value = item.name || "";
+  form.querySelector('[name="category"]').value = item.category || "";
+  form.querySelector('[name="price"]').value = item.price ?? "";
+  form.querySelector('[name="description"]').value = item.description || "";
+  form.querySelector('[name="image"]').value = item.image || "";
+
+  const availableInput = form.querySelector('[name="available"]');
+  if (availableInput) {
+    if (availableInput.type === "checkbox") {
+      availableInput.checked = !!item.available;
+    } else {
+      availableInput.value = item.available ? "true" : "false";
     }
   }
-}
 
-// Hide menu item form
-function hideMenuItemForm() {
-  const container = document. getElementById('menu-item-form-container');
+  const title = document.getElementById("item-form-title");
+  if (title) {
+    title.textContent = "Edit Menu Item";
+  }
+
+  const container = document.getElementById("menu-item-form-container");
   if (container) {
-    container.style.display = 'none';
+    container.style.display = "block";
   }
 }
 
-// Delete category (admin)
+function showMenuItemForm() {
+  const container = document.getElementById("menu-item-form-container");
+  const form = document.getElementById("admin-menu-item-form");
+  const title = document.getElementById("item-form-title");
+
+  if (title) {
+    title.textContent = "Add Menu Item";
+  }
+
+  if (form) {
+    form.reset();
+    delete form.dataset.editId;
+
+    const availableInput = form.querySelector('[name="available"]');
+    if (availableInput && availableInput.type === "checkbox") {
+      availableInput.checked = true;
+    }
+  }
+
+  if (container) {
+    container.style.display = "block";
+  }
+}
+
+function hideMenuItemForm() {
+  const container = document.getElementById("menu-item-form-container");
+  if (container) {
+    container.style.display = "none";
+  }
+}
+
 function deleteCategory(categoryId) {
   if (!auth.isAdmin()) {
-    ui.showToast('Admin access required', 'danger');
+    ui.showToast("Admin access required", "danger");
     return;
   }
 
-  const itemsInCategory = storage.getMenuItems().filter(i => i.category === categoryId).length;
+  const itemsInCategory = storage.getMenuItems().filter(item => item.category === categoryId).length;
   if (itemsInCategory > 0) {
-    ui.showToast('Cannot delete category with menu items', 'warning');
+    ui.showToast("Cannot delete category with menu items", "warning");
     return;
   }
 
-  if (confirm('Are you sure you want to delete this category?')) {
-    storage.deleteCategory(categoryId);
-    ui.showToast('Category deleted', 'success');
-    setTimeout(() => router.loadAdminSection('categories'), 500);
+  if (!confirm("Are you sure you want to delete this category?")) {
+    return;
+  }
+
+  storage.deleteCategory(categoryId);
+  ui.showToast("Category deleted", "success");
+
+  if (typeof router !== "undefined" && typeof router.loadAdminSection === "function") {
+    setTimeout(() => router.loadAdminSection("categories"), 300);
   }
 }
 
-// Edit category (admin)
 function editCategory(categoryId) {
   if (!auth.isAdmin()) {
-    ui.showToast('Admin access required', 'danger');
+    ui.showToast("Admin access required", "danger");
     return;
   }
 
   const category = storage.getCategoryById(categoryId);
   if (!category) {
-    ui.showToast('Category not found', 'danger');
+    ui.showToast("Category not found", "danger");
     return;
   }
 
-  const form = document.getElementById('admin-category-form');
-  if (form) {
-    form.dataset.editId = categoryId;
-    form.querySelector('[name="name"]').value = category.name;
-    form.querySelector('[name="description"]').value = category.description;
+  const form = document.getElementById("admin-category-form");
+  if (!form) {
+    ui.showToast("Category form not found", "danger");
+    return;
+  }
 
-    document.getElementById('form-title').textContent = 'Edit Category';
-    document.getElementById('category-form-container').style.display = 'block';
+  form.dataset.editId = categoryId;
+  form.querySelector('[name="name"]').value = category.name || "";
+  form.querySelector('[name="description"]').value = category.description || "";
+
+  const title = document.getElementById("form-title");
+  if (title) {
+    title.textContent = "Edit Category";
+  }
+
+  const container = document.getElementById("category-form-container");
+  if (container) {
+    container.style.display = "block";
   }
 }
 
-// Show category form
 function showCategoryForm() {
-  const container = document.getElementById('category-form-container');
+  const container = document.getElementById("category-form-container");
+  const form = document.getElementById("admin-category-form");
+  const title = document.getElementById("form-title");
+
+  if (title) {
+    title.textContent = "Add Category";
+  }
+
+  if (form) {
+    form.reset();
+    delete form.dataset.editId;
+  }
+
   if (container) {
-    container.style.display = 'block';
-    document.getElementById('form-title').textContent = 'Add Category';
-    const form = document.getElementById('admin-category-form');
-    if (form) {
-      form.reset();
-      delete form.dataset.editId;
+    container.style.display = "block";
+  }
+}
+
+function hideCategoryForm() {
+  const container = document.getElementById("category-form-container");
+  if (container) {
+    container.style.display = "none";
+  }
+}
+
+function cancelReservation(reservationId) {
+  if (!confirm("Are you sure you want to cancel this reservation?")) {
+    return;
+  }
+
+  const currentUser = auth.getCurrentUser();
+  if (!currentUser) {
+    ui.showToast("Please login first", "warning");
+    window.location.href = "?page=login";
+    return;
+  }
+
+  let result;
+
+  if (typeof reservations !== "undefined" && typeof reservations.cancelReservation === "function") {
+    result = reservations.cancelReservation(reservationId);
+  } else {
+    const reservation = storage.getReservations().find(r => r.id === reservationId);
+    if (!reservation) {
+      result = { success: false, error: "Reservation not found" };
+    } else {
+      const updated = storage.updateReservation(reservationId, { status: "Cancelled" });
+      result = updated
+        ? { success: true, reservation: updated }
+        : { success: false, error: "Failed to cancel reservation" };
     }
   }
-}
 
-// Hide category form
-function hideCategoryForm() {
-  const container = document.getElementById('category-form-container');
-  if (container) {
-    container.style.display = 'none';
+  if (!result || result.success === false) {
+    ui.showToast((result && result.error) || "Failed to cancel reservation", "danger");
+    return;
+  }
+
+  ui.showToast("Reservation cancelled", "success");
+
+  if (typeof router !== "undefined" && typeof router.loadReservationsPage === "function") {
+    setTimeout(() => router.loadReservationsPage(), 300);
+  } else if (typeof router !== "undefined" && typeof router.route === "function") {
+    setTimeout(() => router.route(), 300);
   }
 }
 
-// Cancel reservation
-function cancelReservation(reservationId) {
-  if (confirm('Are you sure you want to cancel this reservation?')) {
-    storage.deleteReservation(reservationId);
-    ui.showToast('Reservation cancelled', 'success');
-    const user = auth.getCurrentUser();
-    setTimeout(() => router.loadUserReservations(user.id), 500);
-  }
-}
-
-// Initialize page after DOM loads
 function initializeApp() {
-  // Storage initialization
-  storage.initialize();
-
-  // Restore session
-  if (auth.isLoggedIn()) {
-    ui.updateUserNavigation();
+  if (typeof storage !== "undefined" && typeof storage.initialize === "function") {
+    storage.initialize();
   }
 
-  // Setup all event listeners
+  if (typeof auth !== "undefined" && auth.isLoggedIn()) {
+    if (typeof ui.updateNavigation === "function") {
+      ui.updateNavigation();
+    } else if (typeof ui.updateUserNavigation === "function") {
+      ui.updateUserNavigation();
+    }
+  }
+
   setupPageEventListeners();
 
-  // Route to correct page
-  if (typeof router !== 'undefined') {
+  if (typeof router !== "undefined" && typeof router.route === "function") {
     router.route();
   }
 
-  ui.updateCartBadge();
+  if (typeof ui.updateCartBadge === "function") {
+    ui.updateCartBadge();
+  }
 }
 
-// Setup all page event listeners
 function setupPageEventListeners() {
-  // Login form
-  const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      ui.handleLogin(e);
+  const loginForm = document.getElementById("login-form");
+  if (loginForm && !loginForm.dataset.bound) {
+    loginForm.addEventListener("submit", function (e) {
+      if (typeof ui.handleLogin === "function") {
+        e.preventDefault();
+        ui.handleLogin(e);
+      }
     });
+    loginForm.dataset.bound = "true";
   }
 
-  // Register form
-  const registerForm = document.getElementById('register-form');
-  if (registerForm) {
-    registerForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      ui.handleRegister(e);
+  const registerForm = document.getElementById("register-form");
+  if (registerForm && !registerForm.dataset.bound) {
+    registerForm.addEventListener("submit", function (e) {
+      if (typeof ui.handleRegister === "function") {
+        e.preventDefault();
+        ui.handleRegister(e);
+      }
     });
+    registerForm.dataset.bound = "true";
   }
 
-  // Reservation form
-  const reservationForm = document.getElementById('reservation-form');
-  if (reservationForm) {
-    const today = new Date().toISOString().split('T')[0];
+  const reservationForm = document.getElementById("reservation-form");
+  if (reservationForm && !reservationForm.dataset.bound) {
+    const today = new Date().toISOString().split("T")[0];
     const dateInput = reservationForm.querySelector('[name="reservationDate"]');
     if (dateInput) {
       dateInput.min = today;
     }
 
-    reservationForm.addEventListener('submit', function(e) {
-      const currentUser = auth.getCurrentUser();
-      if (currentUser) {
-        router.handleReservation(e, currentUser.id);
+    reservationForm.addEventListener("submit", function (e) {
+      if (typeof router.handleReservation === "function") {
+        e.preventDefault();
+        const currentUser = auth.getCurrentUser();
+        if (currentUser) {
+          router.handleReservation(e, currentUser.id);
+        }
       }
     });
+    reservationForm.dataset.bound = "true";
   }
 
-  // Checkout form
-  const checkoutForm = document.getElementById('checkout-form');
-  if (checkoutForm) {
-    checkoutForm.addEventListener('submit', function(e) {
-      router.handleCheckout(e);
+  const checkoutForm = document.getElementById("checkout-form");
+  if (checkoutForm && !checkoutForm.dataset.bound) {
+    checkoutForm.addEventListener("submit", function (e) {
+      if (typeof router.handleCheckout === "function") {
+        e.preventDefault();
+        router.handleCheckout(e);
+      }
     });
+    checkoutForm.dataset.bound = "true";
   }
 
-  // Cart checkout button
-  const checkoutBtn = document.getElementById('checkout-btn');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', function() {
-      if (cart.isEmpty()) {
-        ui.showToast('Your cart is empty', 'warning');
+  const checkoutBtn = document.getElementById("checkout-btn");
+  if (checkoutBtn && !checkoutBtn.dataset.bound) {
+    checkoutBtn.addEventListener("click", function () {
+      if (typeof cart.isEmpty === "function" && cart.isEmpty()) {
+        ui.showToast("Your cart is empty", "warning");
         return;
       }
-      window.location.href = '?page=checkout';
+      window.location.href = "?page=checkout";
     });
+    checkoutBtn.dataset.bound = "true";
   }
 
-  // Back to top button
-  const backToTopBtn = document.querySelector('.back-to-top');
-  if (backToTopBtn) {
-    window.addEventListener('scroll', function() {
+  const backToTopBtn = document.querySelector(".back-to-top");
+  if (backToTopBtn && !backToTopBtn.dataset.bound) {
+    window.addEventListener("scroll", function () {
       if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
+        backToTopBtn.classList.add("show");
       } else {
-        backToTopBtn.classList.remove('show');
+        backToTopBtn.classList.remove("show");
       }
     });
 
-    backToTopBtn.addEventListener('click', function() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    backToTopBtn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
+
+    backToTopBtn.dataset.bound = "true";
   }
 
-  // Category filter on menu page
-  const categoryBtns = document.querySelectorAll('.category-btn');
-  categoryBtns.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const categoryId = this.dataset.category;
-      window.location.href = `?page=menu&category=${categoryId}`;
-    });
-  });
-
-  // Search functionality
-  const searchInput = document.querySelector('[data-search]');
-  if (searchInput) {
+  const searchInput = document.querySelector("[data-search]");
+  if (searchInput && !searchInput.dataset.bound) {
     let searchTimeout;
-    searchInput.addEventListener('input', function() {
+
+    searchInput.addEventListener("input", function () {
       clearTimeout(searchTimeout);
       const query = this.value;
 
-      searchTimeout = setTimeout(function() {
-        if (query.trim() === '') {
+      searchTimeout = setTimeout(function () {
+        if (query.trim() === "") {
           const params = new URLSearchParams(window.location.search);
-          const categoryId = params.get('category') || 'all';
-          router.loadMenuItems(categoryId);
+          const categoryId = params.get("category") || "all";
+
+          if (typeof router.loadMenuItems === "function") {
+            router.loadMenuItems(categoryId);
+          } else if (typeof router.loadMenuPage === "function") {
+            router.loadMenuPage();
+          }
         } else {
           const results = storage.searchMenuItems(query);
-          router.renderMenuItems(results);
+          if (typeof router.renderMenuItems === "function") {
+            router.renderMenuItems(results);
+          }
         }
       }, 300);
     });
+
+    searchInput.dataset.bound = "true";
   }
 }
 
-// Initialize on document ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   initializeApp();
 });
 
-// Handle page visibility changes (restore session)
-document.addEventListener('visibilitychange', function() {
-  if (!document.hidden && !auth.isLoggedIn()) {
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden && typeof auth.restoreSession === "function" && !auth.isLoggedIn()) {
     if (auth.restoreSession()) {
-      ui.updateUserNavigation();
-      ui.updateCartBadge();
+      if (typeof ui.updateNavigation === "function") {
+        ui.updateNavigation();
+      } else if (typeof ui.updateUserNavigation === "function") {
+        ui.updateUserNavigation();
+      }
+
+      if (typeof ui.updateCartBadge === "function") {
+        ui.updateCartBadge();
+      }
     }
   }
 });
-</script>
