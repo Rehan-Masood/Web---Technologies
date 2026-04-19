@@ -7,7 +7,7 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080"></div>
@@ -90,7 +90,6 @@
         <div class="container">
           <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-              <!-- Login Tabs -->
               <ul class="nav nav-tabs mb-3" id="loginTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link active" id="customer-login-tab" data-bs-toggle="tab" data-bs-target="#customer-login" type="button" role="tab">
@@ -104,9 +103,7 @@
                 </li>
               </ul>
 
-              <!-- Tab Content -->
               <div class="tab-content" id="loginTabContent">
-                <!-- Customer Login Tab -->
                 <div class="tab-pane fade show active" id="customer-login" role="tabpanel">
                   <div class="card">
                     <div class="card-header">
@@ -137,7 +134,6 @@
                   </div>
                 </div>
 
-                <!-- Admin Login Tab -->
                 <div class="tab-pane fade" id="admin-login" role="tabpanel">
                   <div class="card">
                     <div class="card-header">
@@ -459,14 +455,15 @@
   <button class="back-to-top"><i class="bi bi-arrow-up"></i></button>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/storage.js"></script>
-  <script src="assets/js/auth.js"></script>
-  <script src="assets/js/cart.js"></script>
-  <script src="assets/js/orders.js"></script>
-  <script src="assets/js/reservations.js"></script>
-  <script src="assets/js/admin.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/helpers.js"></script>
-  <script src="assets/js/router.js"></script>
+  <script src="db.js"></script>
+  <script src="storage.js"></script>
+  <script src="auth.js"></script>
+  <script src="cart.js"></script>
+  <script src="orders.js"></script>
+  <script src="reservations.js"></script>
+  <script src="admin.js"></script>
+  <script src="app.js"></script>
+  <script src="helpers.js"></script>
+  <script src="router.js"></script>
 </body>
 </html>
