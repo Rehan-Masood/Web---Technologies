@@ -785,7 +785,7 @@ class PageRouter {
   }
 
   // ========== ADMIN PAGE ==========
-  loadad minPage() {
+  loadadminPage() {
     if (!auth.isAdmin()) {
       window.location.href = '?page=home';
       return;
