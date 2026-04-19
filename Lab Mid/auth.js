@@ -4,41 +4,54 @@ class AuthManager {
   }
 
   register({ fullName, email, phone, address, password, confirmPassword }) {
-    if (!fullName || !email || !phone || !password || !confirmPassword) {
+    const cleanFullName = String(fullName || "").trim();
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    const cleanPhone = String(phone || "").trim();
+    const cleanAddress = String(address || "").trim();
+    const cleanPassword = String(password || "");
+    const cleanConfirmPassword = String(confirmPassword || "");
+
+    if (!cleanFullName || !cleanEmail || !cleanPhone || !cleanPassword || !cleanConfirmPassword) {
       return { success: false, error: "Please fill all required fields." };
     }
 
-    if (password !== confirmPassword) {
+    if (cleanPassword !== cleanConfirmPassword) {
       return { success: false, error: "Passwords do not match." };
     }
 
     const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
-    if (!strongPassword.test(password)) {
+    if (!strongPassword.test(cleanPassword)) {
       return {
         success: false,
         error: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
       };
     }
 
-    if (this.storage.getUserByEmail(email)) {
+    if (this.storage.getUserByEmail(cleanEmail)) {
       return { success: false, error: "Email is already registered." };
     }
 
     const user = this.storage.addUser({
-      fullName,
-      email,
-      phone,
-      address,
-      password
+      fullName: cleanFullName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      address: cleanAddress,
+      password: cleanPassword
     });
 
     return { success: true, user };
   }
 
   login(email, password, rememberMe = false) {
-    const user = this.storage.getUserByEmail(email);
-    if (!user) return { success: false, error: "Email not found." };
-    if (!this.storage.verifyPassword(password, user.password)) {
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    const cleanPassword = String(password || "");
+
+    const user = this.storage.getUserByEmail(cleanEmail);
+    if (!user) {
+      return { success: false, error: "Email not found." };
+    }
+
+    if (!this.storage.verifyPassword(cleanPassword, user.password)) {
       return { success: false, error: "Invalid password." };
     }
 
@@ -47,13 +60,23 @@ class AuthManager {
   }
 
   adminLogin(email, password, rememberMe = false) {
-    const user = this.storage.getUserByEmail(email);
-    if (!user) return { success: false, error: "Admin account not found." };
-    if (!this.storage.verifyPassword(password, user.password)) {
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    const cleanPassword = String(password || "");
+
+    const user = this.storage.getUserByEmail(cleanEmail);
+    if (!user) {
+      return { success: false, error: "Admin account not found." };
+    }
+
+    if (!this.storage.verifyPassword(cleanPassword, user.password)) {
       return { success: false, error: "Invalid password." };
     }
+
     if (user.role !== "admin") {
-      return { success: false, error: "This account does not have admin access. Only admin users can login here." };
+      return {
+        success: false,
+        error: "This account does not have admin access. Only admin users can login here."
+      };
     }
 
     this.storage.setSession(user, rememberMe);
@@ -80,15 +103,19 @@ class AuthManager {
 
   updateProfile(updates) {
     const currentUser = this.getCurrentUser();
-    if (!currentUser) return { success: false, error: "Not logged in." };
+    if (!currentUser) {
+      return { success: false, error: "Not logged in." };
+    }
 
     const updated = this.storage.updateUser(currentUser.id, {
-      fullName: updates.fullName,
-      phone: updates.phone,
-      address: updates.address
+      fullName: String(updates.fullName || "").trim(),
+      phone: String(updates.phone || "").trim(),
+      address: String(updates.address || "").trim()
     });
 
-    if (!updated) return { success: false, error: "Failed to update profile." };
+    if (!updated) {
+      return { success: false, error: "Failed to update profile." };
+    }
 
     this.storage.setSession(updated, true);
     return { success: true, user: updated };
