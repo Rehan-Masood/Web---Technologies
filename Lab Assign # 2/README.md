@@ -39,6 +39,9 @@ The project uses Laravel, PHP, MySQL, XAMPP, phpMyAdmin, HTML, CSS, and Blade te
 6.
 ![6.](./Screenshot/6.png)
 
+7.
+![7.](./Screenshot/7.png)
+
 ## Registration Form Fields
 
 - Name
