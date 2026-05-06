@@ -20,24 +20,24 @@ The project uses Laravel, PHP, MySQL, XAMPP, phpMyAdmin, HTML, CSS, and Blade te
 - System status panel
 - Premium dark responsive interface
 
-## Screenshots
+## Screenshot
 1.
-![1.](./Screenshots/1.png)
+![1.](./Screenshot/1.png)
 
 2.
-![2.](./Screenshots/2.png)
+![2.](./Screenshot/2.png)
 
 3.
-![3.](./Screenshots/3.png)
+![3.](./Screenshot/3.png)
 
 4.
-![4.](./Screenshots/4.png)
+![4.](./Screenshot/4.png)
 
 5.
-![5.](./Screenshots/5.png)
+![5.](./Screenshot/5.png)
 
 6.
-![6.](./Screenshots/6.png)
+![6.](./Screenshot/6.png)
 
 ## Registration Form Fields
 
