@@ -1,0 +1,2 @@
+<div class="kanban-card" data-id="<?php echo e($task->id); ?>"><h4><?php echo e($task->title); ?></h4><p><?php echo e($task->description ?? 'No description'); ?></p><div class="badges"><span class="badge <?php echo e(strtolower($task->priority)); ?>"><?php echo e($task->priority); ?></span><?php if($task->due_date): ?><span class="badge"><?php echo e($task->due_date->format('M d')); ?></span><?php endif; ?></div></div>
+<?php /**PATH D:\XAMP\htdocs\todo-premium\resources\views/kanban/card.blade.php ENDPATH**/ ?>

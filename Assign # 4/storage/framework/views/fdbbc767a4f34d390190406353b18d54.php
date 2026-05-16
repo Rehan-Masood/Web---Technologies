@@ -1,0 +1,7 @@
+
+<?php $__env->startSection('content'); ?>
+<div class="page-head"><div><h2>Calendar</h2><p>Tasks organized by due date.</p></div><a href="<?php echo e(route('tasks.create')); ?>" class="btn">+ New Task</a></div>
+<div class="card"><h2>Due Date Schedule</h2><?php $__empty_1 = true; $__currentLoopData = $tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><div class="task-card"><div><h3 class="task-title"><?php echo e($task->title); ?></h3><p class="task-desc"><?php echo e($task->description ?? 'No description'); ?></p></div><div class="badges"><span class="badge <?php echo e(strtolower($task->priority)); ?>"><?php echo e($task->priority); ?></span><span class="badge <?php echo e(str_replace(' ','-',strtolower($task->status))); ?>"><?php echo e($task->status); ?></span><span class="badge"><?php echo e($task->due_date ? $task->due_date->format('M d, Y') : 'No Date'); ?></span></div></div><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><p style="color:#94a3b8;margin-top:15px">No tasks with due dates found.</p><?php endif; ?></div>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.premium', ['title' => 'Calendar'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\XAMP\htdocs\todo-premium\resources\views/calendar/index.blade.php ENDPATH**/ ?>

@@ -1,0 +1,12 @@
+
+<?php $__env->startSection('content'); ?>
+<div class="page-head"><div><h2>Edit Task</h2><p>Update your task information.</p></div></div>
+<form class="card form-grid" method="POST" action="<?php echo e(route('tasks.update',$task)); ?>"><?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
+<div class="field"><label>Task Title</label><input class="input" name="title" value="<?php echo e(old('title',$task->title)); ?>" required minlength="3"></div>
+<div class="field"><label>Description</label><textarea class="textarea" name="description"><?php echo e(old('description',$task->description)); ?></textarea></div>
+<div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="field"><label>Category</label><input class="input" name="category" value="<?php echo e(old('category',$task->category)); ?>" required></div><div class="field"><label>Priority</label><select class="select" name="priority"><option>Low</option><?php $__currentLoopData = ['Low','Medium','High']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option <?php if(old('priority',$task->priority)==$p): echo 'selected'; endif; ?>><?php echo e($p); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><option>High</option></select></div><div class="field"><label>Status</label><select class="select" name="status"><?php $__currentLoopData = ['Pending','In Progress','Completed']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><option <?php if(old('status',$task->status)==$s): echo 'selected'; endif; ?>><?php echo e($s); ?></option><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></select></div></div>
+<div class="field"><label>Due Date</label><input class="input" type="date" name="due_date" value="<?php echo e(old('due_date',$task->due_date?->format('Y-m-d'))); ?>"></div><button class="btn">Update Task</button>
+</form>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.premium', ['title' => 'Edit Task'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\XAMP\htdocs\todo-premium\resources\views/tasks/edit.blade.php ENDPATH**/ ?>
