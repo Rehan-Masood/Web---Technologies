@@ -1,0 +1,1 @@
+<div class="kanban-card" data-id="{{ $task->id }}"><h4>{{ $task->title }}</h4><p>{{ $task->description ?? 'No description' }}</p><div class="badges"><span class="badge {{ strtolower($task->priority) }}">{{ $task->priority }}</span>@if($task->due_date)<span class="badge">{{ $task->due_date->format('M d') }}</span>@endif</div></div>

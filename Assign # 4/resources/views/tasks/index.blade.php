@@ -1,0 +1,9 @@
+@extends('layouts.premium', ['title' => 'Tasks'])
+@section('content')
+<div class="page-head"><div><h2>My Tasks</h2><p>Manage, search, edit and delete your database tasks.</p></div><a class="btn" href="{{ route('tasks.create') }}">+ Create Task</a></div>
+<form class="card filters" method="GET"><input class="input" name="search" value="{{ request('search') }}" placeholder="Search task..."><select class="select" name="priority"><option value="">All Priority</option>@foreach(['Low','Medium','High'] as $p)<option value="{{ $p }}" @selected(request('priority')==$p)>{{ $p }}</option>@endforeach</select><select class="select" name="status"><option value="">All Status</option>@foreach(['Pending','In Progress','Completed'] as $s)<option value="{{ $s }}" @selected(request('status')==$s)>{{ $s }}</option>@endforeach</select><button class="btn">Search</button></form>
+@forelse($tasks as $task)
+<div class="task-card"><div><h3 class="task-title">{{ $task->title }}</h3><p class="task-desc">{{ $task->description }}</p></div><div class="badges"><span class="badge">{{ $task->category }}</span><span class="badge {{ strtolower($task->priority) }}">{{ $task->priority }}</span><span class="badge {{ str_replace(' ','-',strtolower($task->status)) }}">{{ $task->status }}</span><span class="badge">{{ $task->due_date?->format('Y-m-d') ?? 'No Date' }}</span><a class="btn secondary" href="{{ route('tasks.edit',$task) }}">Edit</a><form method="POST" action="{{ route('tasks.destroy',$task) }}" onsubmit="return confirm('Delete this task?')">@csrf @method('DELETE')<button class="btn danger">Delete</button></form></div></div>
+@empty <div class="card"><h2>No tasks yet</h2><p style="color:#94a3b8">Create your first task to start organizing your work.</p></div>@endforelse
+<div style="margin-top:20px">{{ $tasks->links() }}</div>
+@endsection
