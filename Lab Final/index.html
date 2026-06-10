@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoodExpress - Premium Food Ordering</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="assets/css/premium.css" />
+</head>
+<body>
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+  <div id="app" class="app-shell"></div>
+
+  <!-- AI Recommender Float Button -->
+  <div id="ai-float-wrap" style="display:none;position:fixed;
+       bottom:28px;right:28px;z-index:9998">
+    <button id="ai-float-btn" onclick="aiOpen()"
+       style="background:#F39C12;border:none;border-radius:50px;
+       padding:12px 22px;display:flex;align-items:center;gap:9px;
+       cursor:pointer;font-size:13px;font-weight:800;color:#000">
+      <span id="ai-pulse" style="width:9px;height:9px;background:#000;
+        border-radius:50%;display:inline-block"></span>
+      ✦ AI Suggest
+    </button>
+  </div>
+
+  <!-- AI Recommender Panel -->
+  <div id="ai-panel" style="display:none;position:fixed;bottom:0;right:0;
+       width:340px;max-height:88vh;overflow-y:auto;z-index:9999;
+       background:#141414;border-top:2px solid #F39C12;
+       border-left:2px solid #F39C12;border-radius:14px 0 0 0;
+       padding:18px 16px">
+
+    <div style="display:flex;justify-content:space-between;
+         align-items:center;margin-bottom:13px">
+      <div style="color:#F39C12;font-size:14px;font-weight:800;
+           display:flex;align-items:center;gap:7px">
+        <span id="ai-panel-dot" style="width:8px;height:8px;
+          background:#F39C12;border-radius:50%;
+          display:inline-block"></span>
+        AI Food Recommender
+      </div>
+      <button onclick="aiClose()" style="background:none;border:none;
+        color:#555;font-size:22px;cursor:pointer;line-height:1;
+        padding:0">&times;</button>
+    </div>
+
+    <p style="color:#666;font-size:11px;margin-bottom:10px">
+      Pick a mood or type your craving
+    </p>
+
+    <div id="ai-moods" style="display:flex;flex-wrap:wrap;
+         gap:6px;margin-bottom:12px">
+      <button class="ai-mc" data-m="spicy and flavorful">Spicy</button>
+      <button class="ai-mc" data-m="something sweet">Sweet</button>
+      <button class="ai-mc" data-m="grilled BBQ meat">BBQ</button>
+      <button class="ai-mc" data-m="biryani rice dish">Biryani</button>
+      <button class="ai-mc" data-m="light and quick meal">Light</button>
+      <button class="ai-mc" data-m="cold drink or dessert">Cold</button>
+      <button class="ai-mc" data-m="pizza or burger fast food">Fast Food</button>
+      <button class="ai-mc" data-m="cheap budget meal">Budget</button>
+    </div>
+
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;
+           margin-bottom:5px">
+        <label style="color:#666;font-size:11px">Max budget</label>
+        <span style="color:#F39C12;font-size:11px;font-weight:700">
+          Rs <span id="ai-bshow">1000</span>
+        </span>
+      </div>
+      <input type="range" id="ai-bslider" min="90" max="2000"
+             step="10" value="1000"
+             style="width:100%;accent-color:#F39C12">
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="color:#666;font-size:11px;
+             display:block;margin-bottom:5px">Category</label>
+      <select id="ai-cat"
+         style="width:100%;background:#0d0f12;color:#ccc;
+         border:1px solid #333;border-radius:8px;
+         padding:7px 10px;font-size:12px">
+        <option value="">All categories</option>
+        <option>Biryani</option>
+        <option>Karahi</option>
+        <option>BBQ</option>
+        <option>Pizza</option>
+        <option>Chinese</option>
+        <option>Desserts</option>
+        <option>Drinks</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:7px;margin-bottom:14px">
+      <input type="text" id="ai-craving"
+         placeholder="e.g. spicy under Rs 500..."
+         style="flex:1;background:#0d0f12;border:1px solid #333;
+         border-radius:8px;color:#ccc;padding:9px 12px;font-size:12px">
+      <button id="ai-findbtn" onclick="aiFind()"
+         style="background:#F39C12;border:none;border-radius:8px;
+         color:#000;font-weight:800;padding:9px 14px;
+         font-size:12px;cursor:pointer;white-space:nowrap">
+        Find ✦
+      </button>
+    </div>
+
+    <div id="ai-results"></div>
+  </div>
+
+  <!-- AI Styles -->
+  <style>
+  @keyframes ai-pulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:0.3;transform:scale(0.65)}
+  }
+  #ai-pulse, #ai-panel-dot {
+    animation: ai-pulse 1.5s infinite;
+  }
+  .ai-mc {
+    background:#1e1e1e;
+    border:1px solid #333;
+    border-radius:20px;
+    color:#aaa;
+    font-size:11px;
+    padding:5px 12px;
+    cursor:pointer;
+    transition:all 0.15s;
+  }
+  .ai-mc:hover { border-color:#F39C12; color:#F39C12; }
+  .ai-mc.active {
+    background:#F39C12;
+    border-color:#F39C12;
+    color:#000;
+    font-weight:800;
+  }
+  .ai-rcard {
+    background:#0d0f12;
+    border-radius:9px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .ai-rcard.ai-best { border:1px solid #F39C12; }
+  .ai-rcard.ai-other { border:1px solid #252525; }
+  .ai-rnum {
+    width:24px;height:24px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;
+    flex-shrink:0;margin-top:1px;
+  }
+  .ai-rnum.gold { background:#F39C12; color:#000; }
+  .ai-rnum.gray { background:#252525; color:#777; }
+  .ai-rname { color:#fff;font-size:12px;font-weight:700;margin-bottom:3px; }
+  .ai-rmeta {
+    display:flex;gap:6px;align-items:center;
+    flex-wrap:wrap;margin-bottom:4px;
+  }
+  .ai-rcat {
+    background:#1e1e1e;color:#777;
+    font-size:10px;padding:2px 7px;border-radius:10px;
+  }
+  .ai-rprice { color:#F39C12;font-size:11px;font-weight:700; }
+  .ai-rstars { color:#F39C12;font-size:10px; }
+  .ai-rreason { color:#666;font-size:11px;line-height:1.5; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/premium-app.js"></script>
+  <script src="assets/js/ai-recommender.js"></script>
+</body>
+</html>
