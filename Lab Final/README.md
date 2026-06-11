@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🍽️ Food Express - Enterprise Food Ordering & Delivery Management System
 
 > **A complete, production-ready food ordering, delivery, and management platform** supporting three distinct user roles: **Customers**, **Delivery Partners**, and **Administrators**. Built with **Laravel (PHP) backend**, **MySQL database**, and **HTML5/CSS3/Bootstrap 5.3** frontend with **local image optimization**. Full-stack enterprise application with RESTful API architecture.
