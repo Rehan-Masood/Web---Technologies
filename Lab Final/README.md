@@ -2,9 +2,146 @@
 
 > **A complete, production-ready food ordering, delivery, and management platform** supporting three distinct user roles: **Customers**, **Delivery Partners**, and **Administrators**. Built with **Laravel (PHP) backend**, **MySQL database**, and **HTML5/CSS3/Bootstrap 5.3** frontend with **local image optimization**. Full-stack enterprise application with RESTful API architecture.
 
-## Screenshot
+## 📸 Screenshots
+
+### 🏠 Home Page
 Home Page 1.
-![Home Page 1.](./Screenshots/Home Page 1.jpg)
+![Home Page 1.](./Screenshots/Home%20Page%201.jpg)
+
+Home Page 2.
+![Home Page 2.](./Screenshots/Home%20Page%202.jpg)
+
+---
+
+### 👤 Registration & Login Pages
+Registration Page.
+![Registration Page.](./Screenshots/Registration%20Page%20.jpg)
+
+Registration Page 1.
+![Registration Page 1.](./Screenshots/Registration%20Page%201.jpg)
+
+Login Page.
+![Login Page.](./Screenshots/Login%20Page.jpg)
+
+Customer Login.
+![Customer Login.](./Screenshots/Customer%20Login.jpg)
+
+Delivery Partner Login.
+![Delivery Partner Login.](./Screenshots/Delivery%20Partner%20Login.jpg)
+
+Admin Login.
+![Admin Login.](./Screenshots/Admin%20Login.jpg)
+
+---
+
+### 🛒 Customer Pages
+Menu Page Full Grid.
+![Menu Page Full Grid.](./Screenshots/Menu%20Page%20full%20Grid.jpg)
+
+Menu Page Category.
+![Menu Page Category.](./Screenshots/Menu%20Page%20(Category).jpg)
+
+Menu Page Searching.
+![Menu Page Searching.](./Screenshots/Menu%20Page%20(Searching).jpg)
+
+AI Food Recommender.
+![AI Food Recommender.](./Screenshots/AI%20Food%20Recommender(Result).jpg)
+
+AI Food Recommender Result.
+![AI Food Recommender Result.](./Screenshots/AI%20Food%20Recommender(Result-1).jpg)
+
+Restaurant Page.
+![Restaurant Page.](./Screenshots/Restaurant%20Page.jpg)
+
+Cart Page.
+![Cart Page.](./Screenshots/Cart%20Page.jpg)
+
+Checkout Page.
+![Checkout Page.](./Screenshots/Checkout%20Page.jpg)
+
+Checkout Page 1.
+![Checkout Page 1.](./Screenshots/Checkout%20Page%201.jpg)
+
+Order Confirmation.
+![Order Confirmation.](./Screenshots/Order%20Confirmation.jpg)
+
+Order Tracking Page.
+![Order Tracking Page.](./Screenshots/Order%20Tracking%20Page.jpg)
+
+Order Tracking Page 1.
+![Order Tracking Page 1.](./Screenshots/Order%20Tracking%20Page%201.jpg)
+
+All Orders Tracking.
+![All Orders Tracking.](./Screenshots/All%20Orders%20Tracking.jpg)
+
+Customer Profile Page.
+![Customer Profile Page.](./Screenshots/Customer%20Profile%20Page.jpg)
+
+---
+
+### 🛠️ Admin Pages
+Admin Dashboard.
+![Admin Dashboard.](./Screenshots/Admin%20Dashboard.jpg)
+
+Admin Dashboard 1.
+![Admin Dashboard 1.](./Screenshots/Admin%20Dashboard%201.jpg)
+
+Admin Restaurants.
+![Admin Restaurants.](./Screenshots/Admin%20Restaurants.jpg)
+
+Admin Categories.
+![Admin Categories.](./Screenshots/Admin%20Categories.jpg)
+
+Admin Menu Items.
+![Admin Menu Items.](./Screenshots/Admin%20menu%20items.jpg)
+
+Admin Orders.
+![Admin Orders.](./Screenshots/Admin%20Order.jpg)
+
+Admin Users.
+![Admin Users.](./Screenshots/Admin%20Users.jpg)
+
+Admin Delivery Partners.
+![Admin Delivery Partners.](./Screenshots/Admin%20Delivery%20Partners.jpg)
+
+Admin Reports.
+![Admin Reports.](./Screenshots/Admin%20Reports.jpg)
+
+Admin Settings.
+![Admin Settings.](./Screenshots/Admin%20Settings.jpg)
+
+---
+
+### 🚴 Delivery Partner Pages
+Delivery Partner Login.
+![Delivery Partner Login.](./Screenshots/Delivery%20Partner%20Login.jpg)
+
+Delivery Partner Dashboard.
+![Delivery Partner Dashboard.](./Screenshots/Delivery%20Partner%20Dashboard.jpg)
+
+Delivery Partner Assigned Orders.
+![Delivery Partner Assigned Orders.](./Screenshots/Delivery%20Partner%20Assigned%20Orders.jpg)
+
+Delivery Accepted By Delivery Partner.
+![Delivery Accepted.](./Screenshots/Delivery%20accepted%20by%20Delivery%20partner.jpg)
+
+Delivery Marked As Picked From Restaurant.
+![Delivery Picked.](./Screenshots/Delivery%20marked%20as%20picked%20from%20restaurant.jpg)
+
+Out For Delivery By Delivery Partner.
+![Out For Delivery.](./Screenshots/Out%20for%20Delivery%20by%20delivery%20partner.jpg)
+
+Mark As Delivered By Delivery Partner.
+![Mark As Delivered.](./Screenshots/Mark%20as%20delivered%20by%20delivery%20partner.jpg)
+
+Delivery Partner History.
+![Delivery Partner History.](./Screenshots/Delivery%20Partner%20History.jpg)
+
+Delivery Partner Earnings.
+![Delivery Partner Earnings.](./Screenshots/Delivery%20Partner%20Earnings.jpg)
+
+Delivery Partner Profile.
+![Delivery Partner Profile.](./Screenshots/Delivery%20Partner%20Profile.jpg)
 
 ## ✨ Quick Stats
 
